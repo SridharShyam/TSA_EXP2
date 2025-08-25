@@ -28,26 +28,26 @@ data.set_index('date', inplace=True)
 data.head()
 data.tail()
 
-resampled_data = data['money'].resample('Y').sum().to_frame()
-resampled_data.index = resampled_data.index.year
+resampled_data = data['money'].resample('M').sum().to_frame()
 resampled_data.reset_index(inplace=True)
-resampled_data.rename(columns={'date': 'Year'}, inplace=True)
+resampled_data.rename(columns={'date': 'Month'
 
-years = resampled_data['Year'].tolist()
+months = list(range(len(resampled_data)))
 money = resampled_data['money'].tolist()
-X = [i - years[len(years) // 2] for i in years]
+n = len(months)
+
+X = [i - months[len(months) // 2] for i in months]
 x2 = [i ** 2 for i in X]
 xy = [i * j for i, j in zip(X, money)]
-n = len(years)
 
+# Linear trend calculation
 b = (n * sum(xy) - sum(money) * sum(X)) / (n * sum(x2) - (sum(X) ** 2))
 a = (sum(money) - b * sum(X)) / n
 linear_trend = [a + b * X[i] for i in range(n)]
 
-x2 = [i ** 2 for i in X]
+# Polynomial trend calculation
 x3 = [i ** 3 for i in X]
 x4 = [i ** 4 for i in X]
-xy = [i * j for i, j in zip(X, money)]
 x2y = [i * j for i, j in zip(x2, money)]
 
 coeff = [[len(X), sum(X), sum(x2)],
@@ -67,37 +67,40 @@ print(f"\nPolynomial Trend: y={a_poly:.2f} + {b_poly:.2f}x + {c_poly:.2f}x²")
 
 resampled_data['Linear Trend'] = linear_trend
 resampled_data['Polynomial Trend'] = poly_trend
-resampled_data.set_index('Year', inplace=True)
 ```
 
 A - LINEAR TREND ESTIMATION
 ```
+# Linear trend plot
 plt.figure(figsize=(8, 6))
-plt.plot(resampled_data.index, resampled_data['money'], 'o-b', label='Actual Data')   # blue dots + line
-plt.plot(resampled_data.index, resampled_data['Linear Trend'], 'k--', label='Linear Trend')  # black dashed line
-plt.xlabel('Year')
-plt.ylabel('Total Money')
-plt.title('Linear Trend Estimation (Degree 1) plot')
+plt.plot(resampled_data['Month'], resampled_data['money'], 'bo-', label='Actual Sales', markersize=4)
+plt.plot(resampled_data['Month'], resampled_data['Linear Trend'], 'r--', linewidth=2, label='Linear Trend')
+plt.xlabel('Month')
+plt.ylabel('Monthly Sales')
+plt.title('Linear Trend Analysis')
 plt.legend()
-plt.show()
+plt.xticks(rotation=45)
+plt.grid(True, alpha=0.3)
 ```
 B- POLYNOMIAL TREND ESTIMATION
 ```
+# Polynomial trend plot
 plt.figure(figsize=(8, 6))
 plt.plot(resampled_data.index, resampled_data['money'], 'o-b', label='Actual Data')   # blue dots + line
-plt.plot(resampled_data.index, resampled_data['Linear Trend'], 'k--', label='Linear Trend')  # black dashed line
+plt.plot(resampled_data.index, resampled_data['Polynomial Trend'], 'k--', label='Polynomial Trend (Degree 2)')  # black dashed line
 plt.xlabel('Year')
 plt.ylabel('Total Money')
-plt.title('Linear Trend Estimation (Degree 1) plot')
+plt.title('Polynomial Trend Estimation plot')
 plt.legend()
 plt.show()
 ```
 ### OUTPUT
 A - LINEAR TREND ESTIMATION
-<img width="713" height="547" alt="image" src="https://github.com/user-attachments/assets/8429f134-6ed8-447f-8ddd-c9630c4da868" />
+<img width="713" height="584" alt="image" src="https://github.com/user-attachments/assets/e3a0384e-a954-4539-89a5-66766b7803f8" />
 
 B- POLYNOMIAL TREND ESTIMATION
-<img width="713" height="547" alt="image" src="https://github.com/user-attachments/assets/43ed0d28-95de-4ef0-a71d-7dfea3119922" />
+<img width="713" height="547" alt="image" src="https://github.com/user-attachments/assets/ee21ad60-c8d4-40cf-b10f-282b7635bebe" />
+
 
 ### RESULT:
 Thus the python program for linear and Polynomial Trend Estiamtion has been executed successfully.
